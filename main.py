@@ -1,3 +1,5 @@
+from flask import Flask, request
+
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
@@ -16,7 +18,7 @@ form = """
     </head>    
     <body>
         <h1>Signup</h1>
-        <form method ="POST">
+        <form action = "/hello" method ="POST">
             <table>
                 <tbody>
                     <tr>
@@ -24,16 +26,16 @@ form = """
                             <label for "username">Username</label>
                         </td>
                         <td>
-                            <input name ="username" value="" type = "text">
+                            <input id = "username" name ="username" value="" type = "text"/>
                             <span class='error'></span>
                         </td>
                     </tr>
                     <tr>
                         <td>
-                            <label for "password"><Password</label>
+                            <label for "password">Password</label>
                         </td>
                         <td>
-                            <input name = "password" type = "password">
+                            <input id = "password" name = "password" type = "password"/>
                             <span class = "error"></span>
                         </td>
                     </tr>
@@ -42,23 +44,39 @@ form = """
                             <label for = "verify">Verify Password</label>
                         </td>
                         <td>
-                            <input name = "verify" type ="password">
+                            <input id = "varify" name = "verify" type ="password"/>
                             <span class = "error"></span>
                         </td>
+                    </tr>
+                    <tr>
                         <td>   
-                            label for = "email">Email (Optional)</label>
+                            <label for = "email">Email (Optional)</label>
                         </td>
                         <td>
-                            <input name = "email" type = "text" value ="">
+                            <input id = "email" name = "email" type = "text" value =""/>
                             <span class="error"></span>
                         </td>
                     </tr>
                 </tbody>
             </table>
-            <input type="submit'>
+            <input type="submit" value = "Submit Query" />
         </form>
     </body>
 </html>
 """
 
+@app.route("/")
+def index():
+    return form
 
+@app.route("/hello", methods = ['POST'])
+def hello():
+    username = request.form["username"]
+    password = request.form["password"]
+    email = request.form["email"]
+    
+    
+    return "<h1>hello, " + username + " at:" + email + "</h1>"
+
+
+app.run()
