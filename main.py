@@ -1,82 +1,20 @@
-from flask import Flask, request, redirect#, render_template
-#import os
+from flask import Flask, request, redirect, render_template
+import os
 #import jinja2
 
 
 #template_dir = os.path.join(os.path.dirname(__file__),'templates')
-#jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader)
-#(template_dir), autoescape =True
+#jinja_env = jinja2.Environment(loader=jinja2.FileSystemLoader
+#(template_dir), autoescape = True)
 
 app = Flask(__name__)
 app.config['DEBUG'] = True
 
-login_form = """
 
-<!DOCTYPE html>
-<html>
-    <head> <title> Sign Up </title>
-        <style>
-            .error {{
-                color:red; 
-            }}
-        </style>   
-    </head>    
-    <body>
-        <h1>SignUp</h1>
-        <form action="/login" method ='POST'>
-            <table>
-                <tbody>
-                    <tr>
-                        <td>
-                            <label for = "username">Username
-                        </td>
-                        <td>
-                            <input id = "username" name ="username" value='{username}' type = "text"/>
-                            </label>
-                            <span class='error'>{username_error}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for = "password">Password
-                        </td>
-                        <td>
-                            <input id = "password" name = "password" type = "password"/>
-                            </label>
-                            <span class = "error">{password_error}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <label for = "verify">Verify Password
-                        </td>
-                        <td>
-                            <input id = "verify" name = "verify" type ="password" />
-                            </label>
-                            <span class = "error">{verify_error}</span>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>   
-                            <label for = "email">Email (Optional)
-                        </td>
-                        <td>
-                            <input id = "email" name = "email" type = "text" value ="{email}"/>
-                            </label>
-                            <span class="error">{email_error}</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <input type="submit"/>
-        </form>
-    </body>
-</html>
-"""
 #creates route handeler for the login page that makes each placeholder element in the form, an empty string (before any data input)
 @app.route('/')
 def display_login_form():
-    return login_form.format(username = '', username_error = '', password = '', password_error = '', verify = '', verify_error = '', email ='', email_error = '')
+    return render_template('signup.html')
 
 
 #create route handler for POSTING the form
@@ -113,28 +51,28 @@ def validate_login():
     
     if password == '':
         password_error = 'Password Error: empty, must be between 4-20 characters'
-        password = ''  
+         
 
     if len(password) < 3  or len(password) > 20: 
         password_error = 'Password Error: must be between 4-20 characters'
-        password = ''
+        
 
     if ' ' in password:
         password_error = 'Password Error: cannot contain spaces'
-        password = ''
+        
 
 # Verify password validataion
     if verify =='':
         verify_error = 'Password Error: empty, must be between 4-20 characters'
-        verify = ''
+        
     
     if len(verify) < 3  or len(verify) > 20: 
         verify_error = 'Password Error: must be between 4-20 characters'
-        verify = ''
+        
     
     if verify != password:
         verify_error = 'Password Error: passwords do not match'
-        verify = ''
+        
  
 # Verify Email  
 
@@ -153,13 +91,17 @@ def validate_login():
         if not email.count('.') == 1:
             email_error = 'Email Error: must be a valid email'
             email = ''
-
-
+# Return template html pages for either 'welcome.html page' if form inputs are valid -or- login.html page showing all form input validation errors.
     if not username_error and not password_error and not verify_error and not email_error:
-       return "success"
+       #username = username  not needed as the variable 'username' value is held b/c either its global -or- this is still considered local area 
+       return redirect('/welcome?username={0}'.format(username))
     else:
-        return login_form.format(username_error = username_error, password_error = password_error, 
-        verify_error=verify_error, email_error = email_error, username=username, email=email)
+        return render_template('signup.html', username_error = username_error, password_error = password_error, 
+        verify_error = verify_error, email_error = email_error, username = username, email = email)
 
+@app.route('/welcome', methods = ['POST' and 'GET'])
+def welcome():
+    username = request.args.get('username')
+    return render_template('welcome.html', username=username)
 
 app.run()
